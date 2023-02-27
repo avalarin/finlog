@@ -6,17 +6,9 @@ environment:
 packages:
     - name: finlog
       shared: false
-      environment: {}
-      parameters: {}
-      annotations: {}
       functions:
         - name: test
           binary: false
           main: ""
           runtime: nodejs:default
           web: true
-          webSecure: false
-          parameters: {}
-          environment: {}
-          annotations: {}
-          limits: {}

@@ -1,0 +1,22 @@
+parameters: {}
+environment:
+  CA_CERT: ${CA_CERT}
+  DATABASE: ${DATABASE}
+  DATABASE_URL: ${DATABASE_URL}
+packages:
+    - name: finlog
+      shared: false
+      environment: {}
+      parameters: {}
+      annotations: {}
+      functions:
+        - name: test
+          binary: false
+          main: ""
+          runtime: nodejs:default
+          web: true
+          webSecure: false
+          parameters: {}
+          environment: {}
+          annotations: {}
+          limits: {}

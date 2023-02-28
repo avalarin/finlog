@@ -1,8 +1,12 @@
 parameters: {}
 environment:
-  CA_CERT: ${CA_CERT}
-  DATABASE: ${DATABASE}
-  DATABASE_URL: ${DATABASE_URL}
+  POSTGRES_HOST: 
+  POSTGRES_PORT:
+  POSTGRES_DB:
+  POSTGRES_USER: 
+  POSTGRES_PASSWORD: 
+  POSTGRES_SCHEMA:
+  POSTGRES_SSL_CA: 
 packages:
     - name: finlog
       shared: false

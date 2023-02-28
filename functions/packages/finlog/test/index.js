@@ -2,9 +2,17 @@ const { Pool } = require('pg')
 
 async function main(args) {
     const pool = new Pool({
-        connectionString: process.env.POSTGRES_URL,
+        host: process.env.POSTGRES_HOST,
+        port: process.env.POSTGRES_PORT,
+        database: process.env.POSTGRES_DB,
         user: process.env.POSTGRES_USER,
-        password: process.env.POSTGRES_PASSWORD
+        password: process.env.POSTGRES_PASSWORD,
+        options: `-c search_path=${process.env.POSTGRES_SCHEMA}`,
+        ssl: {
+            
+            rejectUnauthorized: true,
+            ca: process.env.POSTGRES_SSL_CA.replace(/\\n/g, '\n', ),
+        }
     })
 
     try {

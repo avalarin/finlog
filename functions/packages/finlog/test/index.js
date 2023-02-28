@@ -1,6 +1,6 @@
 const { Pool } = require('pg')
 
-async function main(args) {
+exports.main = async (args) => {
     const pool = new Pool({
         host: process.env.POSTGRES_HOST,
         port: process.env.POSTGRES_PORT,

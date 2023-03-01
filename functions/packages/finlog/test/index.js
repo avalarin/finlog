@@ -1,7 +1,7 @@
 const { Pool } = require('pg')
 
 exports.main = async (args) => {
-    const pool = new Pool({
+    const pgOptions = {
         host: process.env.POSTGRES_HOST,
         port: process.env.POSTGRES_PORT,
         database: process.env.POSTGRES_DB,
@@ -13,9 +13,12 @@ exports.main = async (args) => {
             rejectUnauthorized: true,
             ca: process.env.POSTGRES_SSL_CA.replace(/\\n/g, '\n', ),
         }
-    })
+    }
+    console.log(`Connecting to postgresql ${pgOptions.host}:${pgOptions.port}/${pgOptions.database}...`)
+    const pool = new Pool(pgOptions)
 
     try {
+        console.log('Querying accounts...')
         const res = await pool.query('select * from accounts')
         console.log(res.rows)
         return res.rows

@@ -20,7 +20,7 @@ exports.main = async (args) => {
     try {
         console.log('Querying accounts...')
         const res = await pool.query('select * from accounts')
-        console.log(res.rows)
+        console.log(`Found ${res.rows.length} accounts`)
         return res.rows
     } catch (err) {
         console.error(err)

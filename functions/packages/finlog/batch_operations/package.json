@@ -1,6 +1,11 @@
 {
-  "main": "dist/index.js",
+  "name": "finlog-functions-batch-operations",
+  "main": "index.js",
+  "scripts": {
+    "build": "npm install && npx tsc -p ./tsconfig.json",
+    "test": "npx jest"
+  },
   "dependencies": {
-    "pg-promise": "^11.3.0"
+    "finlog-core": "*"
   }
 }

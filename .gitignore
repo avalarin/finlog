@@ -4,5 +4,7 @@
 .deployed
 
 node_modules
-
+dist
+*.map
 tsconfig.tsbuildinfo
+index.js

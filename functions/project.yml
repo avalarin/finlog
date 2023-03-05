@@ -11,5 +11,5 @@ packages:
   - name: finlog
     shared: false
     actions:
-      - name: test
+      - name: batch_operations
         runtime: nodejs:default

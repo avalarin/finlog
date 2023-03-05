@@ -1,0 +1,7 @@
+{
+  "name": "finlog-functions-batch-operations",
+  "main": "index.js",
+  "dependencies": {
+    "pg-promise": "^11.3.0"
+  }
+}

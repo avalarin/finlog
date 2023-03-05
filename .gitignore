@@ -1,7 +1,8 @@
-.nimbella
-.deployed
-__deployer__.zip
-__pycache__/
-node_modules
-package-lock.json
+.vscode
 .DS_Store
+
+.deployed
+
+node_modules
+
+tsconfig.tsbuildinfo

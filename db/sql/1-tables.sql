@@ -1,12 +1,12 @@
 create extension if not exists "uuid-ossp";
 
-create table prod.currencies (
+create table currencies (
     code varchar(3) primary key,
     name varchar(100) not null,
     flag varchar(4) not null
 );
 
-insert into prod.currencies (code, name, flag) VALUES
+insert into currencies (code, name, flag) VALUES
   ('USD', 'United States Dollar', '🇺🇸'),
   ('EUR', 'Euro', '🇪🇺'),
   ('GBP', 'Pound Sterling', '🇬🇧'),
@@ -31,13 +31,13 @@ insert into prod.currencies (code, name, flag) VALUES
   ('IDR', 'Indonesian Rupiah', '🇮🇩'),
   ('BTC', 'Bitcoin', '🪙');
 
-create table prod.countries (
+create table countries (
   id serial primary key,
   name varchar(100) not null,
   flag varchar(4) not null
 );
 
-insert into prod.countries (name, flag) values
+insert into countries (name, flag) values
 ('Afghanistan', '🇦🇫'),
 ('Albania', '🇦🇱'),
 ('Algeria', '🇩🇿'),
@@ -231,7 +231,7 @@ insert into prod.countries (name, flag) values
 ('Zimbabwe', '🇿🇼'),
 ('None', '🌎');
 
-create table prod.currency_rates (
+create table currency_rates (
   id serial primary key,
   from_currency varchar(3) not null,
   to_currency varchar(3) not null,
@@ -239,15 +239,15 @@ create table prod.currency_rates (
   value numeric(20, 10) not null,
   source varchar(50) not null
 );
-create index idx_currency_rates_from_to ON prod.currency_rates (from_currency, to_currency);
+create index idx_currency_rates_from_to ON currency_rates (from_currency, to_currency);
 
-create table prod.operation_categories (
+create table operation_categories (
   id serial primary key,
   name varchar(100) not null unique,
   description varchar(100) not null default ''
 );
 
-insert into prod.operation_categories (name) values
+insert into operation_categories (name) values
 ('💰 Разное'),
 ('🥦 Питание'),
 ('🚗 Машина'),
@@ -278,47 +278,47 @@ insert into prod.operation_categories (name) values
 ('🔮 В накопления'),
 ('💱 Конвертация');
 
-create table prod.account_categories (
+create table account_categories (
   code varchar(20) primary key,
   name varchar(100) not null unique,
   description varchar(200) not null default ''
 );
 
-insert into prod.account_categories (code, name, description) values
+insert into account_categories (code, name, description) values
 ('current', 'Текущий', 'Для ежедневных трат'),
 ('savings', 'Накопления', 'Счета, с которых не тратим'),
 ('unavailable', 'Недоступно', 'Долги, заблокированные, зависшие средства');
 
-create table prod.users (
+create table users (
   id serial primary key,
   name varchar(100) not null unique,
   full_name varchar(100) not null
 );
 
-create table prod.accounts(
+create table accounts(
   id serial primary key,
   name varchar(100) not null unique,
-  currency varchar(3) not null references prod.currencies (code),
-  category varchar(20) not null references prod.account_categories (code),
-  country_id integer not null references prod.countries (id),
-  owner_id integer not null references prod.users (id),
+  currency varchar(3) not null references currencies (code),
+  category varchar(20) not null references account_categories (code),
+  country_id integer not null references countries (id),
+  owner_id integer not null references users (id),
   comment varchar(200) not null default '',
   created_at timestamp not null default now()
 );
 
 create type transaction_type as enum ('spending', 'income', 'movement');
 
-create table prod.operations(
+create table operations(
   id serial primary key,
   tx_id uuid not null default uuid_generate_v4(),
   tx_seq integer not null default 1,
   tx_type transaction_type not null,
   date timestamp not null,
   amount numeric(20, 10) not null,
-  currency varchar(3) not null references prod.currencies (code),
-  account_id integer not null references prod.accounts (id),
+  currency varchar(3) not null references currencies (code),
+  account_id integer not null references accounts (id),
   exchange_rate numeric(20, 10) not null,
-  category_id integer not null references prod.operation_categories (id),
+  category_id integer not null references operation_categories (id),
   comment varchar(200) not null default '',
   created_at timestamp not null default now()
 );

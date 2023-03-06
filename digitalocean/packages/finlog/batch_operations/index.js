@@ -1,4 +1,4 @@
-const { UploadHandler, connectDatabase, UploadsStorage, createLogger, CommandError } = require('../../../lib/core')
+const { UploadHandler, connectDatabase, UploadsStorage, createLogger, CommandError } = require('./core')
 
 const process = async (command, args) => {
   const logger = createLogger()

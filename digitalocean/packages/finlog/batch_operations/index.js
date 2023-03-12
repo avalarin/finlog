@@ -8,21 +8,7 @@ const process = async (command, args) => {
   const handler = new UploadHandler(storage, logger)
   
   if (!command) throw new CommandError('Parameter command is required')
-  else if (command === 'start') {
-    const { ownerId, contentString, params } = args
-    return await handler.create(ownerId, contentString, params)
-  } else if (command === 'get') {
-    const { id, ownerId } = args
-    return await handler.get(id, ownerId)
-  } else if (command === 'update_params') {
-    const { id, ownerId, params } = args
-    return await handler.updateParams(id, ownerId, params)
-  } else if (command === 'complete') {
-    const { id, ownerId } = args
-    return await handler.complete(id, ownerId)
-  } else {
-    throw new CommandError(`Unknown command ${command}`)
-  }
+  return await handler.handle(command, args)
 }
   
 exports.main = async (args) => {

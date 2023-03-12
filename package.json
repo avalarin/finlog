@@ -4,11 +4,7 @@
   "description": "Finlog app",
   "author": "Alexandr Prokopev <avalarin@gmail.com>",
   "license": "ISC",
-  "scripts": {
-    "build:digitalocean": "npm run build",
-    "build": "npx lerna run build",
-    "test": "npx lerna run test"
-  },
+  "scripts": {},
   "devDependencies": {
     "@jest/globals": "^29.4.3",
     "@types/jest": "^29.4.0",
@@ -16,13 +12,9 @@
     "@typescript-eslint/eslint-plugin": "^5.54.0",
     "@typescript-eslint/parser": "^5.54.0",
     "eslint": "^8.35.0",
+    "eslint-plugin-jest": "^27.2.1",
     "jest": "^29.4.3",
-    "lerna": "^6.5.1",
     "ts-jest": "^29.0.5",
     "typescript": "^4.9.5"
-  },
-  "workspaces": [
-    "./core",
-    "./functions/packages/finlog/*"
-  ]
+  }
 }

@@ -1,20 +1,20 @@
 import pgPromise, { IDatabase } from 'pg-promise'
-import {Logger} from '../utils/logger'
+import { Logger } from '../utils/logger'
+import { IDatabaseConfig } from '../utils/config'
 
 const pgp = pgPromise({})
 
-export const connectDatabase = (logger: Logger): IDatabase<unknown> => {
+export const connectDatabase = (config: IDatabaseConfig, logger: Logger): IDatabase<unknown> => {
   const pgOptions = {
-    host: process.env.POSTGRES_HOST,
-    port: parseInt(process.env.POSTGRES_PORT || '5432'),
-    database: process.env.POSTGRES_DB,
-    user: process.env.POSTGRES_USER,
-    password: process.env.POSTGRES_PASSWORD,
-    options: `-c search_path=${process.env.POSTGRES_SCHEMA}`,
+    host: config.host,
+    port: config.port,
+    database: config.database,
+    user: config.user,
+    password: config.password,
+    options: `-c search_path=${config.schema}`,
     ssl: {
-            
       rejectUnauthorized: true,
-      ca: process.env.POSTGRES_SSL_CA?.replace(/\\n/g, '\n', ) || '',
+      ca: config.sslCA,
     }
   }
   logger.info(`Connecting to postgresql ${pgOptions.host}:${pgOptions.port}/${pgOptions.database}...`)

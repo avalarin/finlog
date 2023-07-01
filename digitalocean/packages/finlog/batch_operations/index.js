@@ -10,7 +10,7 @@ const process = async (command, args) => {
   if (!command) throw new CommandError('Parameter command is required')
   return await handler.handle(command, args)
 }
-  
+    
 exports.main = async (args) => {
   const { command } = args
   

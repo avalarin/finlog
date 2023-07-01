@@ -9,25 +9,26 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateUploadUseCase = void 0;
+exports.UpdateUploadUseCase = void 0;
 const parser_1 = require("./service/parser");
-class CreateUploadUseCase {
+class UpdateUploadUseCase {
     constructor(_storage, _dataMatcher) {
         this._storage = _storage;
         this._dataMatcher = _dataMatcher;
     }
     do(req) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!req.ownerId) {
+            if (!req.uploadId)
+                throw new Error('Argument [uploadId] is required');
+            if (!req.ownerId)
                 throw new Error('Argument [ownerId] is required');
-            }
-            if (!req.contentString) {
-                throw new Error('Argument [contentString] is required');
-            }
-            const matchResult = yield this._dataMatcher.match(req.ownerId, req.contentString, req.params);
-            const parser = new parser_1.Parser(req.contentString, matchResult.params);
+            const upload = yield this._storage.getUpload(req.uploadId, req.ownerId);
+            if (!upload)
+                throw new Error('Upload does not exist');
+            const matchResult = yield this._dataMatcher.match(req.ownerId, upload.rawContent, req.params);
+            const parser = new parser_1.Parser(upload.rawContent, matchResult.params);
             const rows = parser.getRows().map(r => r.fields);
-            const upload = yield this._storage.createUpload(req.ownerId, rows, req.contentString, matchResult.params);
+            yield this._storage.updateUploadContent(req.uploadId, req.ownerId, rows, upload.rawContent, matchResult.params);
             return {
                 id: upload.id,
                 params: matchResult.params
@@ -35,5 +36,5 @@ class CreateUploadUseCase {
         });
     }
 }
-exports.CreateUploadUseCase = CreateUploadUseCase;
-//# sourceMappingURL=create.js.map
+exports.UpdateUploadUseCase = UpdateUploadUseCase;
+//# sourceMappingURL=update.js.map

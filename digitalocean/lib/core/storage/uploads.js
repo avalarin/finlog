@@ -10,13 +10,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UploadsStorage = void 0;
-const selectUploadQuery = 'select id, owner_id, date, status, type, params, ' +
+const selectUploadQuery = 'select id, owner_id, date, status, type, params, raw_content, ' +
     '(select count(*) from upload_contents where upload_id = $1) as rows_count ' +
     'from uploads where id = $1 and owner_id = $2';
-const insertUploadQuery = 'insert into uploads (owner_id, params) values ($1, $2) returning id';
+const insertUploadQuery = 'insert into uploads (owner_id, params, raw_content) values ($1, $2, $3) returning id';
 const insertUploadRowQuery = 'insert into upload_contents (upload_id, row_index, row_data) values ($1, $2, $3)';
 const updateUploadStatusQuery = 'update uploads set status = $3 where id = $1 and owner_id = $2 returning id';
-const updateUploadParamsQuery = 'update uploads set params = $3 where id = $1 and owner_id = $2 returning id';
+const updateUploadContentQuery = 'update uploads set params = $3, raw_content = $4 where id = $1 and owner_id = $2 returning id';
+const deleteUploadRowsQuery = 'delete from upload_contents where upload_id = $1';
 class UploadsStorage {
     constructor(database, logger) {
         this._database = database;
@@ -33,6 +34,7 @@ class UploadsStorage {
                     status: r.status,
                     type: r.type,
                     params: r.params,
+                    rawContent: r.raw_content,
                     rowsCount: +r.rows_count
                 }));
                 this._logger.info(`Found upload ${id} with ${upload.rowsCount}`);
@@ -44,12 +46,12 @@ class UploadsStorage {
             }
         });
     }
-    createUpload(ownerId, rows, params) {
+    createUpload(ownerId, rows, rawContent, params) {
         return __awaiter(this, void 0, void 0, function* () {
             this._logger.info(`Creating upload with owner=${ownerId} and ${rows.length} rows`);
             try {
                 const result = yield this._database.tx((t) => __awaiter(this, void 0, void 0, function* () {
-                    const uploadId = yield t.one(insertUploadQuery, [ownerId, JSON.stringify(params)], r => r.id);
+                    const uploadId = yield t.one(insertUploadQuery, [ownerId, JSON.stringify(params), rawContent], r => r.id);
                     console.log('Inserted upload with ID:', uploadId);
                     yield Promise.all(rows.map((data, index) => {
                         return t.none(insertUploadRowQuery, [uploadId, index, JSON.stringify(data)]);
@@ -85,15 +87,23 @@ class UploadsStorage {
             }
         });
     }
-    updateUploadParams(id, ownerId, params) {
+    updateUploadContent(id, ownerId, rows, rawContent, params) {
         return __awaiter(this, void 0, void 0, function* () {
-            this._logger.info(`Updating params of upload with ${id}, owner=${ownerId} to ${JSON.stringify(params)}`);
+            this._logger.info(`Updating content of upload with ${id}, owner=${ownerId}`);
             try {
-                const updatedId = yield this._database.one(updateUploadParamsQuery, [id, ownerId, JSON.stringify(params)], r => r.id);
-                if (!updatedId) {
-                    throw new Error(`upload ${id} doesn't exist`);
-                }
+                const result = yield this._database.tx((t) => __awaiter(this, void 0, void 0, function* () {
+                    const updatedId = yield t.one(updateUploadContentQuery, [id, ownerId, JSON.stringify(params), rawContent], r => r.id);
+                    if (!updatedId) {
+                        throw new Error(`upload ${id} doesn't exist`);
+                    }
+                    yield t.none(deleteUploadRowsQuery, [id]);
+                    yield Promise.all(rows.map((data, index) => {
+                        return t.none(insertUploadRowQuery, [id, index, JSON.stringify(data)]);
+                    }));
+                    console.log(`Inserted ${rows.length} rows`);
+                }));
                 this._logger.info(`Upload ${id} updated`);
+                return result;
             }
             catch (e) {
                 this._logger.error('Unable to update upload', e);

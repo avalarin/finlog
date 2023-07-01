@@ -11,11 +11,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UploadHandler = void 0;
 const create_1 = require("../use-cases/upload/create");
+const update_1 = require("../use-cases/upload/update");
+const matcher_1 = require("../use-cases/upload/service/matcher");
 const error_1 = require("../utils/error");
 class UploadHandler {
-    constructor(storage, logger) {
-        this._storage = storage;
-        this._logger = logger;
+    constructor(_uploads, dictionaries, _logger) {
+        this._uploads = _uploads;
+        this._logger = _logger;
+        const dataMatcher = new matcher_1.AIDataMatcher(new matcher_1.StorageValuesProvider(dictionaries), this._logger);
+        this._createUseCase = new create_1.CreateUploadUseCase(this._uploads, dataMatcher);
+        this._updateUseCase = new update_1.UpdateUploadUseCase(this._uploads, dataMatcher);
     }
     handle(command, args) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -52,7 +57,7 @@ class UploadHandler {
             const ownerId = Number(ownerIdArg);
             if (isNaN(ownerId))
                 throw new error_1.CommandError('ownerId has invalid number');
-            return yield this._storage.getUpload(id, ownerId);
+            return yield this._uploads.getUpload(id, ownerId);
         });
     }
     create(ownerIdArg, contentString, paramsArg) {
@@ -73,8 +78,7 @@ class UploadHandler {
                 throw new error_1.CommandError('params should be json string');
             }
             const req = { ownerId, params: params || {}, contentString };
-            const usecase = new create_1.CreateUploadUseCase(this._storage, req);
-            return yield usecase.do();
+            return yield this._createUseCase.do(req);
         });
     }
     updateParams(idArg, ownerIdArg, paramsArg) {
@@ -99,7 +103,8 @@ class UploadHandler {
                 throw new error_1.CommandError('params should be json string');
             }
             this._logger.info(`updateParams ${id}, ${ownerId}, ${params}`);
-            return;
+            const req = { uploadId: id, ownerId, params };
+            return yield this._updateUseCase.do(req);
         });
     }
     complete(idArg, ownerIdArg) {

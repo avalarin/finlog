@@ -7,9 +7,21 @@ environment:
   POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
   POSTGRES_SCHEMA: ${POSTGRES_SCHEMA}
   POSTGRES_SSL_CA: ${POSTGRES_SSL_CA}
+  APILAYER_URL: ${APILAYER_URL}
+  APILAYER_TOKEN: ${APILAYER_TOKEN}
 packages:
   - name: finlog
     shared: false
-    actions:
+    functions:
       - name: batch_operations
         runtime: nodejs:default
+      - name: call_command
+        runtime: 'nodejs:default'
+        web: true
+        triggers:
+          - name: trigger-update-currency-rates
+            sourceType: scheduler
+            sourceDetails:
+              cron: "30 15 * * *"
+              withBody:
+                command: 'update-currency-rates'

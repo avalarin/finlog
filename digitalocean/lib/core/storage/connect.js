@@ -6,18 +6,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.connectDatabase = void 0;
 const pg_promise_1 = __importDefault(require("pg-promise"));
 const pgp = (0, pg_promise_1.default)({});
-const connectDatabase = (logger) => {
-    var _a;
+const connectDatabase = (config, logger) => {
     const pgOptions = {
-        host: process.env.POSTGRES_HOST,
-        port: parseInt(process.env.POSTGRES_PORT || '5432'),
-        database: process.env.POSTGRES_DB,
-        user: process.env.POSTGRES_USER,
-        password: process.env.POSTGRES_PASSWORD,
-        options: `-c search_path=${process.env.POSTGRES_SCHEMA}`,
+        host: config.host,
+        port: config.port,
+        database: config.database,
+        user: config.user,
+        password: config.password,
+        options: `-c search_path=${config.schema}`,
         ssl: {
             rejectUnauthorized: true,
-            ca: ((_a = process.env.POSTGRES_SSL_CA) === null || _a === void 0 ? void 0 : _a.replace(/\\n/g, '\n')) || '',
+            ca: config.sslCA,
         }
     };
     logger.info(`Connecting to postgresql ${pgOptions.host}:${pgOptions.port}/${pgOptions.database}...`);

@@ -17,11 +17,11 @@ packages:
         runtime: nodejs:default
       - name: call_command
         runtime: 'nodejs:default'
-        web: true
-        triggers:
-          - name: trigger-update-currency-rates
-            sourceType: scheduler
-            sourceDetails:
-              cron: "30 15 * * *"
-              withBody:
-                command: 'update-currency-rates'
+        # web: true
+        # triggers:
+        #   - name: trigger-update-currency-rates
+        #     sourceType: scheduler
+        #     sourceDetails:
+        #       cron: "30 15 * * *"
+        #       withBody:
+        #         command: 'update-currency-rates'
